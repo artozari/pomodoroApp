@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { SafeAreaView, StyleSheet, Text, StatusBar, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
+import { SafeAreaView, StyleSheet, Text, StatusBar, TextInput, TouchableOpacity, ScrollView, Alert, ToastAndroid as Toast } from "react-native";
 
 export default function App() {
   const [hora, setHora] = useState(new Date().toLocaleTimeString());
@@ -8,7 +8,8 @@ export default function App() {
   const [tiempoIntervalo, setTiempoIntervalo] = useState("");
   const [tiempoDescanso, setTiempoDescanso] = useState("");
   const [cantPomodoros, setCantPomodoros] = useState("");
-  const [tempo, setTiempoRestante] = useState("");
+  const [tiempoRestante, setTiempoRestante] = useState(`00:00:00`);
+  const [tempo, setTempo] = useState(false);
 
   const Input2 = useRef(null);
   const Input3 = useRef(null);
@@ -16,34 +17,59 @@ export default function App() {
   const Input5 = useRef(null);
 
   const comenzar = () => {
-    const tiempoInicio = new Date().getTime();
-    const cicloMiliSeg = tiempoCiclos * 60 * 1000;
-    const horaFinalCiclo = tiempoInicio + cicloMiliSeg;
-    let tiempoRestante = horaFinalCiclo - tiempoInicio;
-    const temporizador = setInterval(() => {
-      tiempoRestante = tiempoRestante - 1000;
-      const horas = Math.floor(tiempoRestante / (1000 * 60 * 60)).toString().padStart(2, "0");
-      const minutos = Math.floor((tiempoRestante % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
-      const segundos = Math.floor((tiempoRestante % (1000 * 60)) / 1000).toString().padStart(2, "0");
-      setTiempoRestante(`${horas}:${minutos}:${segundos}`);
-      console.log(tempo);
-      if (tiempoRestante <= 0) {
-        Alert.alert("Pomodoro", "el temporizador termino")
-        clearInterval(temporizador);
-      }
-    }, 1000);
+    if (tiempoCiclos > 0) {
+      setTempo(true);
+    } else {
+      Toast.show("Debe ingresar el tiempo de ciclos", Toast.SHORT);
+    }
   };
 
-  const detener = () => {
-    setTiempoRestante(0)
-  }
+  const setearTempo = () => {
+    setTempo(!tempo);
+  };
 
   useEffect(() => {
     const intervalo = setInterval(() => {
       setHora(new Date().toLocaleTimeString());
     }, 1000);
-    return () => clearInterval(intervalo); // Función de limpieza para evitar fugas de memoria
+    return () => clearInterval(intervalo);
+
   }, []);
+
+  const temporizar = () => {
+    const tiempoInicio = new Date().getTime();
+    const cicloMiliSeg = tiempoCiclos * 60 * 1000;
+    const horaFinalCiclo = tiempoInicio + cicloMiliSeg;
+    let tiempoRest = horaFinalCiclo - tiempoInicio;
+    let t = tempo;
+    if (tiempoRest > 0) {
+      const [temporizador, setTemporizador] = useState(setInterval(() => {
+        tiempoRest = tiempoRest - 1000;
+        const horas = Math.floor(tiempoRest / (1000 * 60 * 60)).toString().padStart(2, "0");
+        const minutos = Math.floor((tiempoRest % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
+        const segundos = Math.floor((tiempoRest % (1000 * 60)) / 1000).toString().padStart(2, "0");
+        setTiempoRestante(`${horas}:${minutos}:${segundos}`);
+        console.log(tiempoRest);
+        if (tiempoRest <= 0) {
+          setTempo(false);
+          Alert.alert("Pomodoro", "el temporizador termino");
+          clearInterval(temporizador);
+        }
+      }, 1000));
+    }
+  };
+
+  useEffect(() => {
+    let temporizador;
+    if (tempo && tiempoCiclos > 0) {
+      console.log("inicia");
+      temporizador = temporizar();
+    } else {
+      clearInterval(temporizador);
+    }
+    return () => clearInterval(temporizador);
+  }, [tempo]);
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -51,7 +77,7 @@ export default function App() {
         <StatusBar backgroundColor="#D9183B" barStyle="default" />
         <Text style={styles.titleMain}>Pomodoro</Text>
         <Text style={styles.timeText}>{`${hora}`}</Text>
-        {tiempoCiclos > 0 && <Text style={styles.timeText}>{`${tempo}`}</Text>}
+        {tempo && <Text style={styles.timeText}>{`${tiempoRestante}`}</Text>}
         <Text style={styles.descriptionText}>
           {"* "}
           Manual corto para utilizar tu aplicación: Configuración Cantidad de ciclos: Configura el número de ciclos que deseas realizar
@@ -109,15 +135,17 @@ export default function App() {
           ref={Input5}
         />
         <Text>
-          {cantCiclos} + {tiempoCiclos} + {tiempoIntervalo} + {tiempoDescanso} + {cantPomodoros}
+          {cantCiclos} + {tiempoCiclos} + {tiempoIntervalo} + {tiempoDescanso} + {cantPomodoros} + {tempo}
         </Text>
-        <TouchableOpacity style={styles.button} onPress={comenzar}>
-          <Text>INICIAR MÉTODO POMODORO</Text>
-        </TouchableOpacity>
-        {tiempoCiclos > 0 &&
-          <TouchableOpacity style={styles.button} onPress={detener}>
+        {!tempo &&
+          <TouchableOpacity style={styles.button} onPress={comenzar}>
+            <Text>INICIAR MÉTODO POMODORO</Text>
+          </TouchableOpacity>}
+        {tempo &&
+          <TouchableOpacity style={styles.button} onPress={setearTempo}>
             <Text>DETENER</Text>
           </TouchableOpacity>}
+        <Text>{`${tempo}`}</Text>
       </ScrollView>
     </SafeAreaView >
   );
