@@ -1,28 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
-import { SafeAreaView, StyleSheet, Text, StatusBar, TextInput, TouchableOpacity, ScrollView, Alert, ToastAndroid as Toast } from "react-native";
-import Util from "./src/Utils";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  StatusBar,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  ToastAndroid as Toast,
+} from "react-native";
 
 export default function App() {
-
   const [hora, setHora] = useState(new Date().toLocaleTimeString());
-
-  const [cantCiclos, setCantCiclos] = useState(1);
+  const [cantCiclos, setCantCiclos] = useState("");
   const [tiempoCiclos, setTiempoCiclos] = useState("");
   const [tiempoIntervalo, setTiempoIntervalo] = useState("");
   const [tiempoDescanso, setTiempoDescanso] = useState("");
   const [cantPomodoros, setCantPomodoros] = useState("");
-
   const [tiempoRestante, setTiempoRestante] = useState(`00:00:00`);
-  const [horaFinalizacion, setHoraFinalizacion] = useState("");
-  const [horasAlarmas, setHorasAlarmas] = useState("");
-  const [tempo, setTempo] = useState(null);
-  const [game, setGame] = useState(false);
+  const [tempo, setTempo] = useState(false);
 
   const Input2 = useRef(null);
   const Input3 = useRef(null);
   const Input4 = useRef(null);
   const Input5 = useRef(null);
-
 
   const comenzar = () => {
     if (tiempoCiclos > 0) {
@@ -37,20 +39,24 @@ export default function App() {
   };
 
   const temporizar = () => {
-    Util.tiempoRestante(48 * 60);
-    console.log(Util.horaFinal(cantCiclos, tiempoCiclos, tiempoDescanso));
     if (tempo && tiempoCiclos > 0) {
       console.log("inicia");
       const tiempoInicio = new Date().getTime();
       const cicloMiliSeg = tiempoCiclos * 60 * 1000;
       const horaFinalCiclo = tiempoInicio + cicloMiliSeg;
-      let tiempoRest = (horaFinalCiclo - tiempoInicio) * cantCiclos;
+      let tiempoRest = horaFinalCiclo - tiempoInicio;
       if (tiempoRest > 0) {
         temporizador = setInterval(() => {
           tiempoRest = tiempoRest - 1000;
-          const horas = Math.floor(tiempoRest / (1000 * 60 * 60)).toString().padStart(2, "0");
-          const minutos = Math.floor((tiempoRest % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
-          const segundos = Math.floor((tiempoRest % (1000 * 60)) / 1000).toString().padStart(2, "0");
+          const horas = Math.floor(tiempoRest / (1000 * 60 * 60))
+            .toString()
+            .padStart(2, "0");
+          const minutos = Math.floor((tiempoRest % (1000 * 60 * 60)) / (1000 * 60))
+            .toString()
+            .padStart(2, "0");
+          const segundos = Math.floor((tiempoRest % (1000 * 60)) / 1000)
+            .toString()
+            .padStart(2, "0");
           setTiempoRestante(horas + ":" + minutos + ":" + segundos);
           if (tiempoRest <= 0) {
             setTempo(false);
@@ -60,14 +66,14 @@ export default function App() {
         }, 1000);
       }
     } else if (tempo === false) {
-      Toast.show("Temporizador Cancelado", Toast.SHORT);
+      Toast.show("Se detuvo el intervalo", Toast.SHORT);
       setTiempoRestante("00:00:00");
       clearInterval(temporizador);
       console.log("se detuvo");
     }
   };
 
-  useEffect(() => { // No se toca!
+  useEffect(() => {
     const intervalo = setInterval(() => {
       setHora(new Date().toLocaleTimeString());
     }, 1000);
@@ -76,11 +82,41 @@ export default function App() {
 
   let temporizador;
   useEffect(() => {
-    temporizar();
-    return () => {
-      clearInterval(temporizador);
-    };
-  }, [tempo]);
+    if (tempo && tiempoCiclos > 0) {
+      console.log("inicia");
+      // Toast.show(`Inicio`, Toast.SHORT);
+      const tiempoInicio = new Date().getTime();
+      const cicloMiliSeg = tiempoCiclos * 60 * 1000;
+      const horaFinalCiclo = tiempoInicio + cicloMiliSeg;
+      let tiempoRest = horaFinalCiclo - tiempoInicio;
+      if (tiempoRest > 0) {
+        temporizador = setInterval(() => {
+          tiempoRest = tiempoRest - 1000;
+          const horas = Math.floor(tiempoRest / (1000 * 60 * 60))
+            .toString()
+            .padStart(2, "0");
+          const minutos = Math.floor((tiempoRest % (1000 * 60 * 60)) / (1000 * 60))
+            .toString()
+            .padStart(2, "0");
+          const segundos = Math.floor((tiempoRest % (1000 * 60)) / 1000)
+            .toString()
+            .padStart(2, "0");
+          setTiempoRestante(horas + ":" + minutos + ":" + segundos);
+          console.log(`${tiempoRestante} + ${tempo}`);
+          if (tiempoRest <= 0) {
+            setTempo(false);
+            Alert.alert("Pomodoro", "el temporizador termino");
+            clearInterval(temporizador);
+            n;
+          }
+        }, 1000);
+      }
+    } else if (tempo == false) {
+      // Toast.show("Se detuvo el intervalo", Toast.SHORT);
+      console.log("se detuvo");
+    }
+    return () => {};
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -148,16 +184,19 @@ export default function App() {
         <Text>
           {cantCiclos} + {tiempoCiclos} + {tiempoIntervalo} + {tiempoDescanso} + {cantPomodoros} + {tempo}
         </Text>
-        {!tempo &&
+        {!tempo && (
           <TouchableOpacity style={styles.button} onPress={comenzar}>
             <Text>INICIAR MÉTODO POMODORO</Text>
-          </TouchableOpacity>}
-        {tempo &&
+          </TouchableOpacity>
+        )}
+        {tempo && (
           <TouchableOpacity style={styles.button} onPress={setearTempo}>
             <Text>DETENER</Text>
-          </TouchableOpacity>}
+          </TouchableOpacity>
+        )}
+        <Text>{`${tempo}`}</Text>
       </ScrollView>
-    </SafeAreaView >
+    </SafeAreaView>
   );
 }
 
