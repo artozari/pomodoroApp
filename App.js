@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext, createContext } from "react";
 import { SafeAreaView, StyleSheet, Text, StatusBar, TextInput, TouchableOpacity, ScrollView, Alert, ToastAndroid as Toast } from "react-native";
 import Util from "./src/Utils";
 
+
+const Tempo = createContext({ tempo: null });
 export default function App() {
 
   const [hora, setHora] = useState(new Date().toLocaleTimeString());
@@ -39,7 +41,6 @@ export default function App() {
   const temporizar = (tiempoRest) => {
     if (tempo && tiempoCiclos > 0) {
       if (tiempoRest > 0) {
-        Util.horaFinal(cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso);
         temporizador = setInterval(() => {
           tiempoRest = tiempoRest - 1000;
           const horas = Math.floor(tiempoRest / (1000 * 60 * 60)).toString().padStart(2, "0");
@@ -77,79 +78,78 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <StatusBar backgroundColor="#D9183B" barStyle="default" />
-        <Text style={styles.titleMain}>Pomodoro</Text>
-        <Text style={styles.timeText}>{`${hora}`}</Text>
-        {tempo && <Text style={styles.timeText}>{`${tiempoRestante}`}</Text>}
-        <Text style={styles.descriptionText}>
-          {"* "}
-          Manual corto para utilizar tu aplicación: Configuración Cantidad de ciclos: Configura el número de ciclos que deseas realizar
-          en la sesión de Pomodoro. Tiempo de ciclo: Configura el tiempo de cada ciclo (por defecto es de 25 minutos). Tiempo de
-          descanso: Configura el tiempo de descanso entre cada ciclo (por defecto es de 5 minutos). Iniciar sesión Presiona el botón
-          "Iniciar" para comenzar la sesión de Pomodoro. El temporizador comenzará a contar hacia atrás desde el tiempo configurado para
-          cada ciclo. Campos Hora: Muestra la hora actual. Cantidad de ciclos: Muestra el número de ciclos que has completado. Tiempo
-          restante: Muestra el tiempo restante para completar el ciclo actual. Botones Iniciar: Comienza la sesión de Pomodoro. Centrar
-          en mi ubicación: Centra el mapa en tu ubicación actual. Buscar: Busca lugares en el mapa. Espero que este manual sea más útil
-          para ti.
-        </Text>
-        <TextInput
-          returnKeyLabel="dale"
-          returnKeyType="next"
-          style={styles.textInput}
-          placeholder="Cantidad de ciclos"
-          keyboardType="numeric"
-          onChangeText={setCantCiclos}
-          onSubmitEditing={() => Input2.current.focus()}
-        />
-        <TextInput
-          returnKeyType="next"
-          style={styles.textInput}
-          placeholder="Tiempo de ciclos"
-          keyboardType="numeric"
-          onChangeText={setTiempoCiclos}
-          onSubmitEditing={() => Input3.current.focus()}
-          ref={Input2}
-        />
-        <TextInput
-          returnKeyType="next"
-          style={styles.textInput}
-          placeholder="Intervalos del ciclo"
-          keyboardType="numeric"
-          onChangeText={setTiempoIntervalo}
-          onSubmitEditing={() => Input4.current.focus()}
-          ref={Input3}
-        />
-        <TextInput
-          returnKeyType="next"
-          style={styles.textInput}
-          placeholder="Tiempo de descanso"
-          keyboardType="numeric"
-          onChangeText={setTiempoDescanso}
-          onSubmitEditing={() => Input5.current.focus()}
-          ref={Input4}
-        />
-        <TextInput
-          returnKeyLabel="fin"
-          returnKeyType="done"
-          style={styles.textInput}
-          placeholder="Cantidad de Pomodoros"
-          keyboardType="numeric"
-          onChangeText={setCantPomodoros}
-          ref={Input5}
-        />
-        <Text>
-          {cantCiclos} + {tiempoCiclos} + {tiempoIntervalo} + {tiempoDescanso} + {cantPomodoros} + {tempo}
-        </Text>
-        {!tempo &&
-          <TouchableOpacity style={styles.button} onPress={comenzar}>
-            <Text>INICIAR MÉTODO POMODORO</Text>
-          </TouchableOpacity>}
-        {tempo &&
-          <TouchableOpacity style={styles.button} onPress={setearTempo}>
-            <Text>DETENER</Text>
-          </TouchableOpacity>}
-      </ScrollView>
+      <Tempo.Provider value={tempo}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          <StatusBar backgroundColor="#D9183B" barStyle="default" />
+          <Text style={styles.titleMain}>Pomodoro</Text>
+          <Text style={styles.timeText}>{`${hora}`}</Text>
+          {tempo && <Text style={styles.timeText}>{`${tiempoRestante}`}</Text>}
+          <Text style={styles.descriptionText}>
+            {"* "}
+            Manual corto para utilizar tu aplicación: Configuración Cantidad de ciclos: Configura el número de ciclos que deseas realizar
+            en la sesión de Pomodoro. Tiempo de ciclo: Configura el tiempo de cada ciclo (por defecto es de 25 minutos). Tiempo de
+            descanso: Configura el tiempo de descanso entre cada ciclo (por defecto es de 5 minutos). Iniciar sesión Presiona el botón
+            "Iniciar" para comenzar la sesión de Pomodoro. El temporizador comenzará a contar hacia atrás desde el tiempo configurado para
+            cada ciclo. Campos Hora: Muestra la hora actual. Cantidad de ciclos: Muestra el número de ciclos que has completado. Tiempo
+            restante: Muestra el tiempo restante para completar el ciclo actual. Botones Iniciar: Comienza la sesión de Pomodoro. Centrar
+            en mi ubicación: Centra el mapa en tu ubicación actual. Buscar: Busca lugares en el mapa. Espero que este manual sea más útil
+            para ti.
+          </Text>
+          <TextInput
+            returnKeyLabel="dale"
+            returnKeyType="next"
+            style={styles.textInput}
+            placeholder="Cantidad de ciclos"
+            keyboardType="numeric"
+            onChangeText={setCantCiclos}
+            onSubmitEditing={() => Input2.current.focus()}
+          />
+          <TextInput
+            returnKeyType="next"
+            style={styles.textInput}
+            placeholder="Tiempo de ciclos"
+            keyboardType="numeric"
+            onChangeText={setTiempoCiclos}
+            onSubmitEditing={() => Input3.current.focus()}
+            ref={Input2}
+          />
+          <TextInput
+            returnKeyType="next"
+            style={styles.textInput}
+            placeholder="Intervalos del ciclo"
+            keyboardType="numeric"
+            onChangeText={setTiempoIntervalo}
+            onSubmitEditing={() => Input4.current.focus()}
+            ref={Input3}
+          />
+          <TextInput
+            returnKeyType="next"
+            style={styles.textInput}
+            placeholder="Tiempo de descanso"
+            keyboardType="numeric"
+            onChangeText={setTiempoDescanso}
+            onSubmitEditing={() => Input5.current.focus()}
+            ref={Input4}
+          />
+          <TextInput
+            returnKeyLabel="fin"
+            returnKeyType="done"
+            style={styles.textInput}
+            placeholder="Cantidad de Pomodoros"
+            keyboardType="numeric"
+            onChangeText={setCantPomodoros}
+            ref={Input5}
+          />
+          {!tempo &&
+            <TouchableOpacity style={styles.button} onPress={comenzar}>
+              <Text>INICIAR MÉTODO POMODORO</Text>
+            </TouchableOpacity>}
+          {tempo &&
+            <TouchableOpacity style={styles.button} onPress={setearTempo}>
+              <Text>DETENER</Text>
+            </TouchableOpacity>}
+        </ScrollView>
+      </Tempo.Provider>
     </SafeAreaView >
   );
 }
