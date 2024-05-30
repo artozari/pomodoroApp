@@ -36,16 +36,10 @@ export default function App() {
     setTempo(!tempo);
   };
 
-  const temporizar = () => {
-    Util.tiempoRestante(48 * 60);
-    console.log(Util.horaFinal(cantCiclos, tiempoCiclos, tiempoDescanso));
+  const temporizar = (tiempoRest) => {
     if (tempo && tiempoCiclos > 0) {
-      console.log("inicia");
-      const tiempoInicio = new Date().getTime();
-      const cicloMiliSeg = tiempoCiclos * 60 * 1000;
-      const horaFinalCiclo = tiempoInicio + cicloMiliSeg;
-      let tiempoRest = (horaFinalCiclo - tiempoInicio) * cantCiclos;
       if (tiempoRest > 0) {
+        Util.horaFinal(cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso);
         temporizador = setInterval(() => {
           tiempoRest = tiempoRest - 1000;
           const horas = Math.floor(tiempoRest / (1000 * 60 * 60)).toString().padStart(2, "0");
@@ -63,7 +57,6 @@ export default function App() {
       Toast.show("Temporizador Cancelado", Toast.SHORT);
       setTiempoRestante("00:00:00");
       clearInterval(temporizador);
-      console.log("se detuvo");
     }
   };
 
@@ -76,7 +69,7 @@ export default function App() {
 
   let temporizador;
   useEffect(() => {
-    temporizar();
+    temporizar(Util.minToMili((cantCiclos * tiempoCiclos - tiempoIntervalo) + parseInt(tiempoDescanso)));
     return () => {
       clearInterval(temporizador);
     };
