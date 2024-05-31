@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, StyleSheet, Text, View, Alert, ToastAndroid as Toast } from "react-native";
 import Util from "../Utils";
 
-const temporizador = (tRestante) => {
-  const [tiempoRestante, setTiempoRestante] = useState(tRestante);
-  const [tempo, setTempo] = useState(true);
+const Temporizador = ({ tempo, setearTempo, tiempoRestante }) => {
+  const [tRestante, setTRestante] = useState(tiempoRestante);
+  const [horaTermino, setHoraTermino] = useState(Util.addTiempo(new Date(), Util.miliToMin(tiempoRestante)));
+
 
   let temporizador;
+
   useEffect(() => {
+    console.log(tRestante);
     temporizar(tRestante);
     return () => {
       clearInterval(temporizador);
@@ -22,7 +25,7 @@ const temporizador = (tRestante) => {
           const horas = Math.floor(tiempoRest / (1000 * 60 * 60)).toString().padStart(2, "0");
           const minutos = Math.floor((tiempoRest % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
           const segundos = Math.floor((tiempoRest % (1000 * 60)) / 1000).toString().padStart(2, "0");
-          setTiempoRestante(horas + ":" + minutos + ":" + segundos);
+          setTRestante(horas + ":" + minutos + ":" + segundos);
           if (tiempoRest <= 0) {
             setTempo(false);
             Alert.alert("Pomodoro", "el temporizador termino");
@@ -30,22 +33,21 @@ const temporizador = (tRestante) => {
           }
         }, 1000);
       }
-    } else if (tempo === false) {
+    } else {
       Toast.show("Temporizador Cancelado", Toast.SHORT);
-      setTiempoRestante("00:00:00");
+      setTRestante("00:00:00");
       clearInterval(temporizador);
     }
   };
 
   return (
     <View>
-      <Text>temporizador</Text>
-      {tempo && <Text style={styles.timeText}>{`${tiempoRestante}`}</Text>};
+      {tempo && <Text style={styles.timeText}> {`Tiempo restante: ${tRestante} Hora termino ${horaTermino}`}</Text>}
     </View>
   );
 };
 
-export default temporizador;
+export default Temporizador;
 
 const styles = StyleSheet.create({
   timeText: {

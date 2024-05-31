@@ -51,7 +51,11 @@ const tiempoRestanteEnMili = (milisegundos) => {
 const addTiempo = (fechaIni, tiempoEnMin) => {
   if (typeof fechaIni !== 'object' || fechaIni.constructor !== Date) { throw new Error("los tipos de datos no corresponden"); }
   const horaInicio = new Date(fechaIni).getTime();
-  return new Date(horaInicio + minToMili(tiempoEnMin));
+  return new Date(horaInicio + minToMili(tiempoEnMin)).toLocaleTimeString();
+};
+
+const miliToMin = (mili) => {
+  return mili / 60000;
 };
 
 function addHours(hour1, hour2) {
@@ -82,5 +86,6 @@ export default {
   calcularAlarmas,
   tiempoRestante,
   tiempoRestanteEnMili,
-  addTiempo
+  addTiempo,
+  miliToMin
 };
