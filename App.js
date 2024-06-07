@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef, useContext, createContext } from "r
 import { SafeAreaView, StyleSheet, Text, StatusBar, TextInput, TouchableOpacity, ScrollView, Alert, ToastAndroid as Toast } from "react-native";
 import Util from "./src/Utils";
 import Temporizador from "./src/components/Temporizador";
+import Reloj from "./src/components/Reloj";
 
 
 const Control = createContext({ tempo: null });
 export default function App() {
 
-  const [hora, setHora] = useState(new Date().toLocaleTimeString());
 
-  const [cantCiclos, setCantCiclos] = useState(1);
+  const [cantCiclos, setCantCiclos] = useState(0);
   const [tiempoCiclos, setTiempoCiclos] = useState("");
   const [tiempoIntervalo, setTiempoIntervalo] = useState("");
   const [tiempoDescanso, setTiempoDescanso] = useState("");
@@ -28,6 +28,7 @@ export default function App() {
 
 
   const comenzar = () => {
+    // Util.calcularAlarmas(cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso, cantPomodoros);
     setTiempoRestante(Util.minToMili((cantCiclos * tiempoCiclos - tiempoIntervalo) + parseInt(tiempoDescanso)));
     if (tiempoCiclos > 0) {
       setTempo(true);
@@ -37,24 +38,23 @@ export default function App() {
   };
 
   const setearTempo = () => {
+    if (tempo === true) {
+      Alert.alert("Temporizador", "el temporizador se cancelo");
+    }
     setTempo(!tempo);
   };
 
-  useEffect(() => { // No se toca!
-    const intervalo = setInterval(() => {
-      setHora(new Date().toLocaleTimeString());
-    }, 1000);
-    return () => clearInterval(intervalo);
-  }, []);
-
   return (
     <SafeAreaView style={styles.container}>
-      <Control.Provider value={{ tempo, setearTempo, tiempoRestante }}>
+      <Control.Provider value={{ tempo, setTempo }}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <StatusBar backgroundColor="#D9183B" barStyle="default" />
           <Text style={styles.titleMain}>Pomodoro</Text>
-          <Text style={styles.timeText}>{`${hora}`}</Text>
-          {tempo && <Temporizador tempo={tempo} setearTempo={setearTempo} tiempoRestante={tiempoRestante}></Temporizador>}
+          <Reloj />
+          {tempo && Util.calcularAlarmas(cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso, cantPomodoros).map((alarma) => {
+            <Text key={alarma.id}>Hola</Text>;
+            // <Temporizador key={alarma.id} tempo={tempo} setTempo={setTempo} tiempoRestante={alarma}></Temporizador>;
+          })}
           <Text style={styles.descriptionText}>
             {"* "}
             Manual corto para utilizar tu aplicación: Configuración Cantidad de ciclos: Configura el número de ciclos que deseas realizar

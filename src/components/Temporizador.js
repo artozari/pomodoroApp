@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, StyleSheet, Text, View, Alert, ToastAndroid as Toast } from "react-native";
 import Util from "../Utils";
 
-const Temporizador = ({ tempo, setearTempo, tiempoRestante }) => {
+const Temporizador = ({ tempo, setTempo, tiempoRestante }) => {
   const [tRestante, setTRestante] = useState(tiempoRestante);
   const [horaTermino, setHoraTermino] = useState(Util.addTiempo(new Date(), Util.miliToMin(tiempoRestante)));
 
@@ -10,7 +10,6 @@ const Temporizador = ({ tempo, setearTempo, tiempoRestante }) => {
   let temporizador;
 
   useEffect(() => {
-    console.log(tRestante);
     temporizar(tRestante);
     return () => {
       clearInterval(temporizador);
@@ -34,7 +33,7 @@ const Temporizador = ({ tempo, setearTempo, tiempoRestante }) => {
         }, 1000);
       }
     } else {
-      Toast.show("Temporizador Cancelado", Toast.SHORT);
+      // Toast.show("Temporizador Cancelado", Toast.SHORT);
       setTRestante("00:00:00");
       clearInterval(temporizador);
     }
@@ -42,7 +41,7 @@ const Temporizador = ({ tempo, setearTempo, tiempoRestante }) => {
 
   return (
     <View>
-      {tempo && <Text style={styles.timeText}> {`Tiempo restante: ${tRestante} Hora termino ${horaTermino}`}</Text>}
+      {tempo && <Text style={styles.timeText}> {`Restante: ${tRestante} Hora termino ${horaTermino}`}</Text>}
     </View>
   );
 };

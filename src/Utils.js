@@ -21,11 +21,18 @@ function minToMili(min) {
 const calcularAlarmas = (cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso, cantPomodoros) => {
   let horasAlarmas = [];
   let horaInicio = new Date().getTime();
+  console.log(cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso, cantPomodoros, "F()calcularFechas");//los datos que entran
   for (let i = 0; i < cantCiclos; i++) {
-    let horaAlarma = new Date(horaInicio + (i * (toMili(tiempoCiclos) + toMili(tiempoDescanso))));
-    horasAlarmas.push(horaAlarma.toLocaleTimeString());
+    let horaEnfoque = horaInicio + minToMili(tiempoCiclos);
+    horasAlarmas.push(horaEnfoque);
+    let horaIntervalo = horaEnfoque + minToMili(tiempoIntervalo);
+    horasAlarmas.push(horaIntervalo);
   }
-  console.log(`Alarmas ${horasAlarmas}`);
+  let horaDescanso = new Date(horaInicio + minToMili((cantCiclos * tiempoCiclos) - tiempoIntervalo)).getTime();
+  horasAlarmas.push(horaDescanso);
+  horasAlarmas.sort();
+  horasAlarmas.splice(horasAlarmas.length - 2, 1);
+  console.log(`Alarmas ${horasAlarmas.sort()}`);// datos que salen
   return horasAlarmas;
 };
 
@@ -78,6 +85,8 @@ function addHours(hour1, hour2) {
 
   return `${totalHours.toString().padStart(2, "0")}:${totalMinutes.toString().padStart(2, "0")}:${totalSeconds.toString().padStart(2, "0")}`;
 }
+
+
 
 export default {
   validador,
