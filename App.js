@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext, createContext } from "react";
-import { SafeAreaView, StyleSheet, Text, StatusBar, TextInput, TouchableOpacity, ScrollView, Alert, ToastAndroid as Toast } from "react-native";
+import { SafeAreaView, StyleSheet, Text, StatusBar, TextInput, TouchableOpacity, ScrollView, Alert, ToastAndroid as Toast, View } from "react-native";
 import Util from "./src/Utils";
 import Temporizador from "./src/components/Temporizador";
 import Reloj from "./src/components/Reloj";
@@ -8,12 +8,12 @@ import Reloj from "./src/components/Reloj";
 const Control = createContext({ tempo: null });
 export default function App() {
 
-
   const [cantCiclos, setCantCiclos] = useState(0);
   const [tiempoCiclos, setTiempoCiclos] = useState("");
   const [tiempoIntervalo, setTiempoIntervalo] = useState("");
   const [tiempoDescanso, setTiempoDescanso] = useState("");
   const [cantPomodoros, setCantPomodoros] = useState("");
+  const [Alarmas, setAlarmas] = useState();
 
   const [tiempoRestante, setTiempoRestante] = useState(`00:00:00`);
   const [horaFinalizacion, setHoraFinalizacion] = useState("");
@@ -26,10 +26,9 @@ export default function App() {
   const Input4 = useRef(null);
   const Input5 = useRef(null);
 
-
   const comenzar = () => {
-    // Util.calcularAlarmas(cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso, cantPomodoros);
-    setTiempoRestante(Util.minToMili((cantCiclos * tiempoCiclos - tiempoIntervalo) + parseInt(tiempoDescanso)));
+    setAlarmas(Util.calcularAlarmas(cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso, cantPomodoros));
+    // setTiempoRestante(Util.minToMili((cantCiclos * tiempoCiclos - tiempoIntervalo) + parseInt(tiempoDescanso)));
     if (tiempoCiclos > 0) {
       setTempo(true);
     } else {
@@ -44,17 +43,23 @@ export default function App() {
     setTempo(!tempo);
   };
 
+  const listaAlarmas =
+    Alarmas.map((alarma) => {
+      console.log(alarma);
+      <View>
+        <Temporizador key={alarma.id} tempo={tempo} tiempoRestante={alarma} />;
+      </View>;
+    });
+
+
   return (
     <SafeAreaView style={styles.container}>
-      <Control.Provider value={{ tempo, setTempo }}>
+      <Control.Provider value={{ tempo, setTempo, Alarmas }}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           <StatusBar backgroundColor="#D9183B" barStyle="default" />
           <Text style={styles.titleMain}>Pomodoro</Text>
           <Reloj />
-          {tempo && Util.calcularAlarmas(cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso, cantPomodoros).map((alarma) => {
-            <Text key={alarma.id}>Hola</Text>;
-            // <Temporizador key={alarma.id} tempo={tempo} setTempo={setTempo} tiempoRestante={alarma}></Temporizador>;
-          })}
+          {tempo && <Text>{listaAlarmas}</Text>}
           <Text style={styles.descriptionText}>
             {"* "}
             Manual corto para utilizar tu aplicación: Configuración Cantidad de ciclos: Configura el número de ciclos que deseas realizar

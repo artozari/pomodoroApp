@@ -13,7 +13,6 @@ const horaFinal = (cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso) =>
   return new Date(horaFinalPomodoro).toLocaleTimeString();
 };
 
-
 function minToMili(min) {
   return min * 60 * 1000;
 }
