@@ -19,23 +19,26 @@ function minToMili(min) {
 
 const calcularAlarmas = (cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso, cantPomodoros) => {
   let horasAlarmas = [];
-  let horaInicio = new Date().getTime();
-  console.log(cantCiclos, tiempoCiclos, tiempoIntervalo, tiempoDescanso, cantPomodoros, "F()calcularFechas");//los datos que entran
-  for (let i = 0; i < cantCiclos; i++) {
-    let horaEnfoque = horaInicio + minToMili(tiempoCiclos);
-    horasAlarmas.push(horaEnfoque);
-    let horaIntervalo = horaEnfoque + minToMili(tiempoIntervalo);
-    horasAlarmas.push(horaIntervalo);
+  let tEnfoque = minToMili(tiempoCiclos - tiempoIntervalo);
+  let tIntervalo = minToMili(tiempoIntervalo);
+  let tDescanso = minToMili(tiempoDescanso);
+  let tRecorido = 0;
+  if (cantCiclos > 0) {
+    for (let i = 0; i < cantCiclos; i++) {
+      tRecorido = tRecorido + tEnfoque;
+      horasAlarmas.push(tRecorido);
+      tRecorido = tRecorido + tIntervalo;
+      horasAlarmas.push(tRecorido);
+    }
+    tRecorido = tRecorido + tDescanso - tIntervalo;
+    horasAlarmas.push(tRecorido);
+    console.log(horasAlarmas);
+    horasAlarmas.splice(horasAlarmas.length - 2, 1);
   }
-  let horaDescanso = new Date(horaInicio + minToMili((cantCiclos * tiempoCiclos) - tiempoIntervalo)).getTime();
-  horasAlarmas.push(horaDescanso);
-  horasAlarmas.sort();
-  horasAlarmas.splice(horasAlarmas.length - 2, 1);
-  console.log(`Alarmas ${horasAlarmas.sort()}`);// datos que salen
   return horasAlarmas;
 };
 
-const tiempoRestante = (min) => {
+const tiempoRestante = (min) => { // Dado número de minutos, calcula el tiempo restante en horas, minutos y segundos.
   min = min * 60 * 1000;
   const horas = Math.floor(min / (1000 * 60 * 60)).toString().padStart(2, "0");
   const minutos = Math.floor((min % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
@@ -45,7 +48,7 @@ const tiempoRestante = (min) => {
   return tiempoRestante;
 };
 
-const tiempoRestanteEnMili = (milisegundos) => {
+const tiempoRestanteEnMili = (milisegundos) => { //  Dado milisegundos, calcula el tiempo restante en horas, minutos y segundos.
   const horas = Math.floor(milisegundos / (1000 * 60 * 60)).toString().padStart(2, "0");
   const minutos = Math.floor((milisegundos % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, "0");
   const segundos = Math.floor((milisegundos % (1000 * 60)) / 1000).toString().padStart(2, "0");
@@ -54,38 +57,15 @@ const tiempoRestanteEnMili = (milisegundos) => {
   return tiempoRestante;
 };
 
-const addTiempo = (fechaIni, tiempoEnMin) => {
+const addTiempo = (fechaIni, tiempoEnMin) => {// retorna la hora en la que cierto tiempo dado terminara.
   if (typeof fechaIni !== 'object' || fechaIni.constructor !== Date) { throw new Error("los tipos de datos no corresponden"); }
   const horaInicio = new Date(fechaIni).getTime();
   return new Date(horaInicio + minToMili(tiempoEnMin)).toLocaleTimeString();
 };
 
-const miliToMin = (mili) => {
+const miliToMin = (mili) => { // Retorna los minutos que genera los milisegundos dados
   return mili / 60000;
 };
-
-function addHours(hour1, hour2) {
-  const [hours1, minutes1, seconds1] = hour1.split(":").map(Number);
-  const [hours2, minutes2, seconds2] = hour2.split(":").map(Number);
-
-  let totalHours = hours1 + hours2;
-  let totalMinutes = minutes1 + minutes2;
-  let totalSeconds = seconds1 + seconds2;
-
-  if (totalMinutes >= 60) {
-    totalHours++;
-    totalMinutes -= 60;
-  }
-
-  if (totalSeconds >= 60) {
-    totalMinutes++;
-    totalSeconds -= 60;
-  }
-
-  return `${totalHours.toString().padStart(2, "0")}:${totalMinutes.toString().padStart(2, "0")}:${totalSeconds.toString().padStart(2, "0")}`;
-}
-
-
 
 export default {
   validador,
