@@ -80,7 +80,6 @@ export default function App() {
             para ti.
           </Text>
           <TextInput
-            returnKeyLabel="dale"
             returnKeyType="next"
             style={styles.textInput}
             placeholder="Cantidad de ciclos"

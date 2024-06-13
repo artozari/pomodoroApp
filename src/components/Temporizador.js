@@ -3,6 +3,7 @@ import { SafeAreaView, StyleSheet, Text, View, Alert, ToastAndroid as Toast } fr
 import Util from "../Utils";
 
 const Temporizador = ({ tempo, setTempo, tiempoRestante }) => {
+  const [temp, setTemp] = useState(tempo);
   const [tRestante, setTRestante] = useState(tiempoRestante);
   const [horaTermino, setHoraTermino] = useState(Util.addTiempo(new Date(), Util.miliToMin(tiempoRestante)));
 
@@ -13,9 +14,9 @@ const Temporizador = ({ tempo, setTempo, tiempoRestante }) => {
     return () => {
       clearInterval(temporizador);
     };
-  }, [tempo]);
+  }, [temp]);
   const temporizar = (tiempoRest) => {
-    if (tempo) {
+    if (temp) {
       if (tiempoRest > 0) {
         temporizador = setInterval(() => {
           tiempoRest = tiempoRest - 1000;
@@ -24,7 +25,7 @@ const Temporizador = ({ tempo, setTempo, tiempoRestante }) => {
           const segundos = Math.floor((tiempoRest % (1000 * 60)) / 1000).toString().padStart(2, "0");
           setTRestante(horas + ":" + minutos + ":" + segundos);
           if (tiempoRest <= 0) {
-            setTempo(false);
+            setTemp(false);
             Alert.alert("Pomodoro", "el temporizador termino");
             clearInterval(temporizador);
           }
